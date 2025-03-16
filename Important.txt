@@ -1,0 +1,9 @@
+pv_power_per_panel = 0.4  # kW per panel
+wt_power_per_turbine = 20  # kW per turbine
+
+ef_pv = 50 / 1000  # kg CO2/kWh
+ef_wt = 10 / 1000  # kg CO2/kWh
+ef_grid = 300 / 1000  # kg CO2/kWh
+
+cost_weight = 0.6 #in the reward function
+co2_weight = 0.4 #in the reward function
