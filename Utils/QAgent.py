@@ -1,7 +1,3 @@
-import numpy as np
-import random
-import matplotlib.pyplot as plt
-
 class EnhancedQAgent:
     def __init__(self, env, alpha=0.1, gamma=0.98, epsilon=1.0, epsilon_decay=0.995, min_epsilon=0.05, max_energy=200):
         self.env = env
