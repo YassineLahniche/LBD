@@ -1,7 +1,7 @@
 // Configuration API
 const API_BASE_URL = 'http://localhost:5000/api';
-const DEFAULT_LATITUDE = 48.8566;  // Paris (à modifier selon votre localisation)
-const DEFAULT_LONGITUDE = 2.3522;
+const DEFAULT_LATITUDE = 33.61;  // Paris (à modifier selon votre localisation)
+const DEFAULT_LONGITUDE = 7.65;
 
 // API object for the app.js to use
 const API = {

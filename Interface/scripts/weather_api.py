@@ -1,66 +1,118 @@
-# Ajoutez ce code dans un nouveau fichier scripts/weather_api.py
+from flask import Flask, jsonify, request
+from flask_cors import CORS  # Add this import
 import requests
+from datetime import datetime
+import numpy as np
+import math
 
-# Constants
+app = Flask(__name__)
+CORS(app, origins=["http://localhost:3000"])  # Allow requests from your frontend
+
+# Constants from your code
 R = 287.05  # Specific gas constant for dry air in J/(kg·K)
-API_URL = "https://api.open-meteo.com/v1/forecast"
-
-# Wind turbine parameters (adjustable)
-TURBINE_RADIUS = 50  # Radius of the wind turbine blades in meters
+TURBINE_RADIUS = 5  # Radius of the wind turbine blades in meters
 EFFICIENCY_WIND = 0.4  # Efficiency of the wind turbine (40%)
-
-# Solar panel parameters (adjustable)
 EFFICIENCY_SOLAR = 0.2  # Efficiency of the solar panels (20%)
-SOLAR_CONSTANT = 1361  # Solar constant in W/m² (average solar radiation at the top of the atmosphere)
 
-def fetch_weather_data(latitude, longitude):
+OPEN_METEO_API = "https://api.open-meteo.com/v1/forecast"
+
+def calculate_wind_power(wind_speed_kmh, air_density=1.225, turbine_radius=TURBINE_RADIUS, efficiency=EFFICIENCY_WIND):
     """
-    Fetches hourly weather data from the Open-Meteo API, including solar radiation.
+    Calculates wind power generated using the wind power formula.
+
+    Args:
+        wind_speed_kmh (float): Wind speed in km/h.
+        air_density (float): Air density in kg/m³.
+        turbine_radius (float): Radius of the wind turbine blades in meters.
+        efficiency (float): Efficiency of the wind turbine.
+
+    Returns:
+        float: Wind power generated in watts.
     """
+    wind_speed_ms = wind_speed_kmh / 3.6  # Convert km/h to m/s
+    swept_area = np.pi * turbine_radius**2  # A = πR²
+    power = 0.5 * air_density * swept_area * wind_speed_ms**3 * efficiency
+    return round(power, 2)
+
+def calculate_solar_power(solar_radiation, efficiency=EFFICIENCY_SOLAR):
+    """
+    Calculates solar power generated based on solar radiation and daylight.
+
+    Args:
+        solar_radiation (float): Solar radiation in W/m².
+        efficiency (float): Efficiency of the solar panels.
+
+    Returns:
+        float: Solar power generated in watts.
+    """
+    area = 1.0  # m²
+    return round(solar_radiation * efficiency * area, 2)
+
+
+def fetch_current_weather(latitude, longitude):
+    """Fetch current weather data from Open-Meteo"""
     params = {
         "latitude": latitude,
         "longitude": longitude,
-        "hourly": "temperature_2m,pressure_msl,wind_speed_10m,is_day,shortwave_radiation",
-        "timezone": "auto",
-        "forecast_days": 7  # Get forecast for the next 7 days
+        "current": "temperature_2m,wind_speed_10m,shortwave_radiation",
+        "timezone": "auto"
     }
-    try:
-        response = requests.get(API_URL, params=params)
-        response.raise_for_status()
-        return response.json()
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching data: {e}")
-        return None
+    response = requests.get(OPEN_METEO_API, params=params)
+    return response.json()
 
-def calculate_wind_power(wind_speed, air_density=1.225):
-    """
-    Calculate potential wind power based on wind speed and turbine parameters
-    """
-    # P = 0.5 * ρ * A * v³ * Cp
-    # where ρ is air density, A is swept area, v is wind speed, Cp is power coefficient
-    area = 3.14159 * (TURBINE_RADIUS ** 2)
-    power = 0.5 * air_density * area * (wind_speed ** 3) * EFFICIENCY_WIND
-    return power
-
-def calculate_solar_power(radiation):
-    """
-    Calculate potential solar power based on radiation data
-    """
-    # P = A * r * η
-    # where A is area, r is radiation, η is efficiency
-    # Assuming 1 m² of solar panel for simplicity
-    area = 1.0  # m²
-    power = area * radiation * EFFICIENCY_SOLAR
-    return power
-
-def get_forecast_data(latitude, longitude):
-    """
-    Returns processed forecast data for wind and solar power
-    """
-    weather_data = fetch_weather_data(latitude, longitude)
+@app.route('/api/sensor/solar', methods=['GET'])
+def get_solar_power():
+    """Get current solar power generation"""
+    lat = request.args.get('lat', 33.61)
+    lon = request.args.get('lon', 7.65)
     
-    if not weather_data:
-        return None
+    weather_data = fetch_current_weather(lat, lon)
+    radiation = weather_data['current']['shortwave_radiation']
+    power = calculate_solar_power(radiation)
+    
+    return jsonify({
+        "power": power,
+        "radiation": radiation,
+        "timestamp": datetime.now().isoformat()
+    })
+
+@app.route('/api/sensor/wind', methods=['GET'])
+def get_wind_power():
+    """Get current wind power generation"""
+    lat = request.args.get('lat', 33.61)
+    lon = request.args.get('lon', 7.65)
+    
+    weather_data = fetch_current_weather(lat, lon)
+    wind_speed = weather_data['current']['wind_speed_10m']
+    power = calculate_wind_power(wind_speed)
+    
+    return jsonify({
+        "power": power,
+        "wind_speed": wind_speed,
+        "timestamp": datetime.now().isoformat()
+    })
+
+@app.route('/api/sensor/grid', methods=['GET'])
+def get_grid_power():
+    """Simulated grid consumption"""
+    return jsonify({
+        "power": 8500 + (500 * math.sin(datetime.now().minute)),
+        "timestamp": datetime.now().isoformat()
+    })
+
+@app.route('/api/forecast/<float:lat>/<float:lon>', methods=['GET'])
+def get_forecast(lat, lon):
+    """Get 7-day forecast with energy calculations"""
+    params = {
+        "latitude": lat,
+        "longitude": lon,
+        "hourly": "temperature_2m,wind_speed_10m,shortwave_radiation",
+        "timezone": "auto",
+        "forecast_days": 7
+    }
+    
+    response = requests.get(OPEN_METEO_API, params=params)
+    weather_data = response.json()
     
     result = {
         "time": weather_data["hourly"]["time"],
@@ -71,14 +123,13 @@ def get_forecast_data(latitude, longitude):
         "solar_power": []
     }
     
-    # Calculate potential power for each hour
-    for i, wind_speed in enumerate(weather_data["hourly"]["wind_speed_10m"]):
-        radiation = weather_data["hourly"]["shortwave_radiation"][i]
-        
-        wind_power = calculate_wind_power(wind_speed)
-        solar_power = calculate_solar_power(radiation)
-        
+    for i in range(len(result["time"])):
+        wind_power = calculate_wind_power(result["wind_speed"][i])
+        solar_power = calculate_solar_power(result["radiation"][i])
         result["wind_power"].append(wind_power)
         result["solar_power"].append(solar_power)
     
-    return result
+    return jsonify(result)
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
