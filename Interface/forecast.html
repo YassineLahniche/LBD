@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prévisions Météorologiques</title>
+    <link rel="stylesheet" href="style/main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Prévisions Météorologiques et Potentiel de Production d'Énergie</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Tableau de bord</a></li>
+                <li><a href="forecast.html" class="active">Prévisions</a></li>
+                <li><a href="energy-graph.html">Graphiques d'énergie</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="location-selector">
+            <h2>Sélection de l'emplacement</h2>
+            <div class="form-group">
+                <label for="latitude">Latitude:</label>
+                <input type="number" id="latitude" step="0.0001" value="48.8566">
+            </div>
+            <div class="form-group">
+                <label for="longitude">Longitude:</label>
+                <input type="number" id="longitude" step="0.0001" value="2.3522">
+            </div>
+            <button id="update-location">Mettre à jour</button>
+        </section>
+
+        <section id="forecast-summary">
+            <h2>Résumé des prévisions</h2>
+            <div class="summary-cards">
+                <div class="card">
+                    <h3>Production Éolienne</h3>
+                    <div class="chart-container">
+                        <canvas id="wind-power-chart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Production Solaire</h3>
+                    <div class="chart-container">
+                        <canvas id="solar-power-chart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Température</h3>
+                    <div class="chart-container">
+                        <canvas id="temperature-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="forecast-details">
+            <h2>Détails des prévisions (24h)</h2>
+            <div id="forecast-table"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Système de Gestion Intelligente d'Énergie Renouvelable</p>
+    </footer>
+
+    <script src="scripts/forecast.js"></script>
+    <script>
+        // Add event listener for the update location button
+        document.getElementById('update-location').addEventListener('click', () => {
+            const latitude = document.getElementById('latitude').value;
+            const longitude = document.getElementById('longitude').value;
+            
+            // Clear existing charts
+            document.getElementById('wind-power-chart').getContext('2d').clearRect(0, 0, 
+                document.getElementById('wind-power-chart').width, 
+                document.getElementById('wind-power-chart').height);
+            document.getElementById('solar-power-chart').getContext('2d').clearRect(0, 0, 
+                document.getElementById('solar-power-chart').width, 
+                document.getElementById('solar-power-chart').height);
+            document.getElementById('temperature-chart').getContext('2d').clearRect(0, 0, 
+                document.getElementById('temperature-chart').width, 
+                document.getElementById('temperature-chart').height);
+            
+            // Update forecast with new location
+            fetchForecastData(latitude, longitude).then(data => {
+                if (data) {
+                    createWindPowerChart(data);
+                    createSolarPowerChart(data);
+                    createTemperatureChart(data);
+                    displayForecastTable(data);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

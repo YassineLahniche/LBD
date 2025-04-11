@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord Énergétique</title>
+    <link rel="stylesheet" href="style/main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Système de Gestion Intelligente d'Énergie Renouvelable</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html" class="active">Tableau de bord</a></li>
+                <li><a href="forecast.html">Prévisions</a></li>
+                <li><a href="energy-graph.html">Graphiques d'énergie</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="real-time-data">
+            <h2>Données en Temps Réel</h2>
+            <div class="energy-cards">
+                <div class="card">
+                    <img src="assets/icons/solar.svg" alt="Énergie Solaire">
+                    <h3>Énergie Solaire</h3>
+                    <div class="power-value" id="solar-power">0 W</div>
+                    <div class="power-meter">
+                        <div class="meter-fill" id="solar-meter"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="assets/icons/wind.svg" alt="Énergie Éolienne">
+                    <h3>Énergie Éolienne</h3>
+                    <div class="power-value" id="wind-power">0 W</div>
+                    <div class="power-meter">
+                        <div class="meter-fill" id="wind-meter"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="assets/icons/grid.svg" alt="Réseau Électrique">
+                    <h3>Réseau Électrique</h3>
+                    <div class="power-value" id="grid-power">0 W</div>
+                    <div class="power-meter">
+                        <div class="meter-fill" id="grid-meter"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="allocation-decision">
+            <h2>Décision d'Allocation</h2>
+            <div class="decision-container">
+                <div class="decision-card">
+                    <h3>Allocation Recommandée</h3>
+                    <div class="allocation-chart-container">
+                        <canvas id="allocation-chart"></canvas>
+                    </div>
+                </div>
+                <div class="decision-card">
+                    <h3>Justification de l'IA</h3>
+                    <div id="ai-explanation">
+                        <p>L'agent RL détermine la meilleure allocation des ressources énergétiques...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="power-history">
+            <h2>Historique de Puissance</h2>
+            <div class="chart-container">
+                <canvas id="power-history-chart"></canvas>
+            </div>
+        </section>
+
+        <section id="weather-conditions">
+            <h2>Conditions Météorologiques Actuelles</h2>
+            <div class="weather-cards">
+                <div class="card">
+                    <h3>Température</h3>
+                    <div class="weather-value" id="temperature">--°C</div>
+                </div>
+                <div class="card">
+                    <h3>Vitesse du Vent</h3>
+                    <div class="weather-value" id="wind-speed">-- m/s</div>
+                </div>
+                <div class="card">
+                    <h3>Radiation Solaire</h3>
+                    <div class="weather-value" id="solar-radiation">-- W/m²</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Système de Gestion Intelligente d'Énergie Renouvelable</p>
+    </footer>
+
+    <script src="scripts/api.js"></script>
+    <script src="scripts/ui.js"></script>
+    <script src="scripts/app.js"></script>
+</body>
+</html>
