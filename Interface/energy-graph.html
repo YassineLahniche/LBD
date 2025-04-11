@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphiques d'Énergie</title>
+    <link rel="stylesheet" href="style/main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Système de Gestion Intelligente d'Énergie Renouvelable</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Tableau de bord</a></li>
+                <li><a href="forecast.html">Prévisions</a></li>
+                <li><a href="energy-graph.html" class="active">Graphiques d'énergie</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="energy-production">
+            <h2>Production d'Énergie</h2>
+            <div class="chart-container" style="height: 400px;">
+                <canvas id="production-chart"></canvas>
+            </div>
+        </section>
+
+        <section id="energy-consumption">
+            <h2>Consommation d'Énergie</h2>
+            <div class="chart-container" style="height: 400px;">
+                <canvas id="consumption-chart"></canvas>
+            </div>
+        </section>
+
+        <section id="energy-efficiency">
+            <h2>Efficacité du Système</h2>
+            <div class="efficiency-metrics">
+                <div class="card">
+                    <h3>Utilisation des Énergies Renouvelables</h3>
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="renewable-usage-chart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Économies Réalisées</h3>
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="savings-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="historical-data">
+            <h2>Données Historiques</h2>
+            <div class="time-range-selector">
+                <button class="time-btn active" data-range="day">Jour</button>
+                <button class="time-btn" data-range="week">Semaine</button>
+                <button class="time-btn" data-range="month">Mois</button>
+                <button class="time-btn" data-range="year">Année</button>
+            </div>
+            <div class="chart-container" style="height: 400px;">
+                <canvas id="historical-chart"></canvas>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Système de Gestion Intelligente d'Énergie Renouvelable</p>
+    </footer>
+
+    <script src="scripts/energy-graph.js"></script>
+</body>
+</html>
