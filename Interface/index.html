@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau de Bord Énergétique</title>
-    <link rel="stylesheet" href="style/main.css">
+    <link rel="stylesheet" href="static/style/main.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
 </head>
 <body>
@@ -24,7 +24,7 @@
             <h2>Données en Temps Réel</h2>
             <div class="energy-cards">
                 <div class="card">
-                    <img src="assets/icons/solar.svg" alt="Énergie Solaire">
+                    <img src="static/assets/icons/solar.svg" alt="Énergie Solaire">
                     <h3>Énergie Solaire</h3>
                     <div class="power-value" id="solar-power">0 W</div>
                     <div class="power-meter">
@@ -32,7 +32,7 @@
                     </div>
                 </div>
                 <div class="card">
-                    <img src="assets/icons/wind.svg" alt="Énergie Éolienne">
+                    <img src="static/assets/icons/wind.svg" alt="Énergie Éolienne">
                     <h3>Énergie Éolienne</h3>
                     <div class="power-value" id="wind-power">0 W</div>
                     <div class="power-meter">
@@ -40,7 +40,7 @@
                     </div>
                 </div>
                 <div class="card">
-                    <img src="assets/icons/grid.svg" alt="Réseau Électrique">
+                    <img src="static/assets/icons/grid.svg" alt="Réseau Électrique">
                     <h3>Réseau Électrique</h3>
                     <div class="power-value" id="grid-power">0 W</div>
                     <div class="power-meter">
@@ -70,8 +70,11 @@
 
         <section id="power-history">
             <h2>Historique de Puissance</h2>
-            <div class="chart-container">
-                <canvas id="power-history-chart"></canvas>
+            <div class="chart-fullwidth-container">
+                <div id="chart-legend-container" class="chart-legend-container"></div>
+                <div class="chart-wrapper">
+                    <canvas id="power-history-chart"></canvas>
+                </div>
             </div>
         </section>
 
@@ -98,8 +101,8 @@
         <p>Système de Gestion Intelligente d'Énergie Renouvelable</p>
     </footer>
 
-    <script src="scripts/api.js"></script>
-    <script src="scripts/ui.js"></script>
-    <script src="scripts/app.js"></script>
+    <script src="static/scripts/api.js"></script>
+    <script src="static/scripts/ui.js"></script>
+    <script src="static/scripts/app.js"></script>
 </body>
 </html>

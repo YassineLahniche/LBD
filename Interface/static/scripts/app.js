@@ -8,7 +8,7 @@ const appState = {
   windData: null,
   gridData: null,
   rlDecision: null,
-  updateInterval: 5000 // Intervalle de mise à jour en ms
+  updateInterval: 500 // Intervalle de mise à jour en ms
 };
 
 /**

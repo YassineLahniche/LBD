@@ -273,7 +273,7 @@ function createSavingsChart() {
     });
 }
 
-// Create historical chart based on time range
+// Create historical chart based on time range with improved performance, full-width display, and continuous operation
 function createHistoricalChart(timeRange) {
     const ctx = document.getElementById('historical-chart').getContext('2d');
     
@@ -295,7 +295,8 @@ function createHistoricalChart(timeRange) {
                     backgroundColor: 'rgba(255, 206, 86, 0.2)',
                     borderColor: 'rgba(255, 206, 86, 1)',
                     borderWidth: 2,
-                    tension: 0.1
+                    tension: 0.1,
+                    hidden: false
                 },
                 {
                     label: 'Énergie Éolienne (kWh)',
@@ -303,7 +304,8 @@ function createHistoricalChart(timeRange) {
                     backgroundColor: 'rgba(54, 162, 235, 0.2)',
                     borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 2,
-                    tension: 0.1
+                    tension: 0.1,
+                    hidden: false
                 },
                 {
                     label: 'Réseau Électrique (kWh)',
@@ -311,19 +313,34 @@ function createHistoricalChart(timeRange) {
                     backgroundColor: 'rgba(255, 99, 132, 0.2)',
                     borderColor: 'rgba(255, 99, 132, 1)',
                     borderWidth: 2,
-                    tension: 0.1
+                    tension: 0.1,
+                    hidden: false
                 }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: {
+                duration: 150 // Short animation for better performance but still visual feedback
+            },
             scales: {
                 y: {
                     beginAtZero: true,
                     title: {
                         display: true,
                         text: 'Énergie (kWh)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: true
+                    },
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45,
+                        autoSkip: true,
+                        maxTicksLimit: 20 // Prevent overcrowding on x-axis
                     }
                 }
             },
@@ -332,87 +349,236 @@ function createHistoricalChart(timeRange) {
                     display: true,
                     text: `Production d'Énergie (${getTimeRangeTitle(timeRange)})`,
                     font: {
-                        size: 16
+                        size: 18
+                    },
+                    padding: {
+                        top: 10,
+                        bottom: 20
+                    }
+                },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        boxWidth: 40,
+                        padding: 10,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
                     }
                 }
+            },
+            elements: {
+                point: {
+                    radius: 3, // Smaller points for better performance
+                    hoverRadius: 5
+                },
+                line: {
+                    borderWidth: 2
+                }
+            },
+            // Prevent excessive CPU usage by limiting update rate
+            resizeDelay: 100,
+            interaction: {
+                mode: 'nearest',
+                intersect: false
             }
+        }
+    });
+    
+    // Generate custom toggle buttons
+    generateToggleButtons();
+    
+    // Set up continuous update if needed
+    setupContinuousUpdates(timeRange);
+}
+    
+// Update historical chart with debouncing and memory management
+function updateHistoricalChart(timeRange) {
+    if (!historicalChart) return;
+    
+    // Use requestAnimationFrame for better performance
+    if (updateRequestId) {
+        cancelAnimationFrame(updateRequestId);
+    }
+    
+    updateRequestId = requestAnimationFrame(() => {
+        const { labels, solarData, windData, gridData } = generateHistoricalData(timeRange);
+        
+        // Update data efficiently
+        historicalChart.data.labels = labels;
+        historicalChart.data.datasets[0].data = solarData;
+        historicalChart.data.datasets[1].data = windData;
+        historicalChart.data.datasets[2].data = gridData;
+        historicalChart.options.plugins.title.text = `Production d'Énergie (${getTimeRangeTitle(timeRange)})`;
+        
+        // Update with reduced animation for faster rendering
+        historicalChart.update('active');
+        
+        // Clear reference to allow garbage collection
+        updateRequestId = null;
+    });
+}
+
+// Generate toggle buttons for each dataset
+function generateToggleButtons() {
+    const legendContainer = document.getElementById('chart-legend-container');
+    if (!legendContainer) return;
+    
+    // Clear existing buttons
+    legendContainer.innerHTML = '';
+    
+    // Create toggle button for each dataset
+    historicalChart.data.datasets.forEach((dataset, index) => {
+        const button = document.createElement('button');
+        button.classList.add('toggle-button');
+        if (!dataset.hidden) {
+            button.classList.add('active');
+        }
+        
+        // Set button color based on dataset
+        button.style.borderColor = dataset.borderColor;
+        button.style.backgroundColor = dataset.hidden ? '#ffffff' : dataset.backgroundColor;
+        
+        // Add button text
+        button.textContent = dataset.label;
+        
+        // Add click event
+        button.addEventListener('click', () => {
+            // Toggle dataset visibility
+            const meta = historicalChart.getDatasetMeta(index);
+            meta.hidden = !meta.hidden;
+            
+            // Toggle button visual state
+            button.classList.toggle('active');
+            button.style.backgroundColor = meta.hidden ? '#ffffff' : dataset.backgroundColor;
+            
+            // Save state to dataset
+            dataset.hidden = meta.hidden;
+            
+            // Update chart
+            historicalChart.update();
+        });
+        
+        legendContainer.appendChild(button);
+    });
+}
+
+// Setup continuous updates if needed
+function setupContinuousUpdates(timeRange) {
+    // Clear any existing interval
+    if (updateInterval) {
+        clearInterval(updateInterval);
+    }
+    
+    // Determine update frequency based on time range
+    let updateFrequency;
+    switch (timeRange) {
+        case 'day':
+            updateFrequency = 30000; // 30 seconds for day view
+            break;
+        case 'week':
+            updateFrequency = 60000; // 1 minute for week view
+            break;
+        case 'month':
+            updateFrequency = 300000; // 5 minutes for month view
+            break;
+        case 'year':
+            updateFrequency = 900000; // 15 minutes for year view
+            break;
+        default:
+            updateFrequency = 60000; // 1 minute default
+    }
+    
+    // Set up continuous update interval
+    updateInterval = setInterval(() => {
+        updateHistoricalChart(timeRange);
+    }, updateFrequency);
+    
+    // Clean up interval on page unload
+    window.addEventListener('beforeunload', () => {
+        if (updateInterval) {
+            clearInterval(updateInterval);
         }
     });
 }
 
-// Update historical chart when time range changes
-function updateHistoricalChart(timeRange) {
-    const { labels, solarData, windData, gridData } = generateHistoricalData(timeRange);
+// Efficient resize handler with debouncing
+let resizeTimer;
+let updateRequestId;
+let updateInterval;
+
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        if (historicalChart) {
+            historicalChart.resize();
+        }
+    }, 100);
+});
+
+// Memory-efficient function to get time range title
+function getTimeRangeTitle(timeRange) {
+    const titles = {
+        'day': 'Dernières 24 Heures',
+        'week': 'Dernière Semaine',
+        'month': 'Dernier Mois',
+        'year': 'Dernière Année'
+    };
     
-    historicalChart.data.labels = labels;
-    historicalChart.data.datasets[0].data = solarData;
-    historicalChart.data.datasets[1].data = windData;
-    historicalChart.data.datasets[2].data = gridData;
-    historicalChart.options.plugins.title.text = `Production d'Énergie (${getTimeRangeTitle(timeRange)})`;
-    
-    historicalChart.update();
+    return titles[timeRange] || timeRange;
 }
 
-// Generate sample historical data based on time range
-function generateHistoricalData(timeRange) {
-    let labels = [];
-    let dataPoints = 0;
+// Function to clean up resources when component unmounts or page changes
+function cleanupChart() {
+    if (updateInterval) {
+        clearInterval(updateInterval);
+    }
     
+    if (updateRequestId) {
+        cancelAnimationFrame(updateRequestId);
+    }
+    
+    if (historicalChart) {
+        historicalChart.destroy();
+        historicalChart = null;
+    }
+}
+
+// Throttle function to prevent too frequent updates
+function throttle(func, delay) {
+    let lastCall = 0;
+    return function(...args) {
+        const now = new Date().getTime();
+        if (now - lastCall < delay) {
+            return;
+        }
+        lastCall = now;
+        return func(...args);
+    };
+}
+
+// Use throttled function for window resize
+window.addEventListener('resize', throttle(() => {
+    if (historicalChart) {
+        historicalChart.resize();
+    }
+}, 100));
+
+// Function to get a human-readable title for time range
+function getTimeRangeTitle(timeRange) {
     switch (timeRange) {
         case 'day':
-            // 24 hours
-            for (let i = 0; i < 24; i++) {
-                labels.push(`${i}:00`);
-            }
-            dataPoints = 24;
-            break;
+            return 'Dernières 24 Heures';
         case 'week':
-            // 7 days
-            const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-            for (let i = 0; i < 7; i++) {
-                labels.push(days[i]);
-            }
-            dataPoints = 7;
-            break;
+            return 'Dernière Semaine';
         case 'month':
-            // 30 days
-            for (let i = 1; i <= 30; i++) {
-                labels.push(`${i}`);
-            }
-            dataPoints = 30;
-            break;
+            return 'Dernier Mois';
         case 'year':
-            // 12 months
-            const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
-            labels = months;
-            dataPoints = 12;
-            break;
+            return 'Dernière Année';
+        default:
+            return timeRange;
     }
-    
-    // Generate sample data
-    const solarData = [];
-    const windData = [];
-    const gridData = [];
-    
-    for (let i = 0; i < dataPoints; i++) {
-        // Solar variations
-        if (timeRange === 'day') {
-            // Daily pattern for solar (daylight)
-            solarData.push(i >= 6 && i <= 18 ? Math.random() * 5 + 2 : Math.random() * 0.5);
-        } else {
-            solarData.push(Math.random() * 4 + 3);
-        }
-        
-        // Wind variations
-        windData.push(Math.random() * 6 + 2);
-        
-        // Grid usage
-        gridData.push(Math.random() * 3 + 1);
-    }
-    
-    return { labels, solarData, windData, gridData };
 }
-
 // Get title based on time range
 function getTimeRangeTitle(timeRange) {
     switch (timeRange) {
