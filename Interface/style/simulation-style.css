@@ -1,0 +1,123 @@
+/* Simulation page styles */
+#simulation-controls {
+    padding: 1rem;
+    background-color: #f5f7f9;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+}
+
+#simulation-controls .form-group {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+#simulation-controls label {
+    width: 250px;
+    font-weight: 500;
+}
+
+#simulation-controls input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 120px;
+}
+
+#start-simulation {
+    background-color: #4CAF50;
+    color: white;
+    padding: 0.7rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    margin-top: 0.5rem;
+}
+
+#start-simulation:hover {
+    background-color: #3e8e41;
+}
+
+#start-simulation:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.results-cards, .simulation-stats {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.results-cards .card {
+    flex: 1;
+    height: 300px;
+}
+
+.chart-container {
+    position: relative;
+    height: 250px;
+    width: 100%;
+}
+
+.stat-card {
+    flex: 1;
+    background-color: #f5f7f9;
+    padding: 1rem;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.stat-card h3 {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    color: #666;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.simulation-table-container {
+    overflow-x: auto;
+    margin-top: 1.5rem;
+}
+
+#simulation-data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#simulation-data-table th, 
+#simulation-data-table td {
+    padding: 0.75rem;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+#simulation-data-table th {
+    background-color: #f2f2f2;
+    font-weight: 600;
+}
+
+#simulation-data-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Make the table responsive */
+@media screen and (max-width: 1024px) {
+    .results-cards, .simulation-stats {
+        flex-direction: column;
+    }
+    
+    .results-cards .card, .stat-card {
+        width: 100%;
+    }
+    
+    .results-cards .card {
+        height: 250px;
+    }
+}

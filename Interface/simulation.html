@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation d'Énergie</title>
+    <link rel="stylesheet" href="style/main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Simulation Intelligente d'Allocation d'Énergie</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Tableau de bord</a></li>
+                <li><a href="forecast.html">Prévisions</a></li>
+                <li><a href="energy-graph.html">Graphiques d'énergie</a></li>
+                <li><a href="simulation.html" class="active">Simulation IA</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="simulation-controls">
+            <h2>Contrôles de Simulation</h2>
+            <div class="form-group">
+                <label for="simulation-time">Durée de simulation (heures):</label>
+                <input type="number" id="simulation-time" min="1" max="72" value="24">
+            </div>
+            <div class="form-group">
+                <label for="energy-demand">Demande d'énergie (kW):</label>
+                <input type="number" id="energy-demand" min="10" max="500" value="100">
+            </div>
+            <div class="form-group">
+                <label for="grid-price">Prix de l'électricité du réseau (€/kWh):</label>
+                <input type="number" id="grid-price" min="0.05" max="0.5" step="0.01" value="0.15">
+            </div>
+            <button id="start-simulation">Démarrer la Simulation</button>
+        </section>
+
+        <section id="simulation-results">
+            <h2>Résultats de la Simulation</h2>
+            <div class="results-cards">
+                <div class="card">
+                    <h3>Répartition d'Énergie</h3>
+                    <div class="chart-container">
+                        <canvas id="energy-allocation-chart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Coût et Émissions</h3>
+                    <div class="chart-container">
+                        <canvas id="cost-emissions-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="simulation-details">
+            <h2>Détails de la Simulation</h2>
+            <div class="simulation-stats">
+                <div class="stat-card">
+                    <h3>Panneaux Solaires</h3>
+                    <div class="stat-value" id="avg-pv-panels">--</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Éoliennes</h3>
+                    <div class="stat-value" id="avg-wind-turbines">--</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Électricité du Réseau</h3>
+                    <div class="stat-value" id="avg-grid-power">--</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Coût Total</h3>
+                    <div class="stat-value" id="total-cost">--</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Émissions CO2</h3>
+                    <div class="stat-value" id="total-co2">--</div>
+                </div>
+            </div>
+            <div class="simulation-table-container">
+                <table id="simulation-data-table">
+                    <thead>
+                        <tr>
+                            <th>Heure</th>
+                            <th>Facteur Solaire</th>
+                            <th>Facteur Éolien</th>
+                            <th>Panneaux PV</th>
+                            <th>Éoliennes</th>
+                            <th>Puissance Réseau</th>
+                            <th>Énergie Totale</th>
+                            <th>Coût</th>
+                            <th>Émissions CO2</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be filled by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Système de Gestion Intelligente d'Énergie Renouvelable</p>
+    </footer>
+
+    <script src="scripts/api.js"></script>
+    <script src="scripts/simulation.js"></script>
+</body>
+</html>

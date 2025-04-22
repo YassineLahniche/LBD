@@ -1,3 +1,5 @@
+import numpy as np
+
 def naive_strategy(env, episodes=200, max_steps=5000, max_energy=200):
     """Industry standard heuristic-based strategy for energy management.
     Uses rule-based decision making with some adaptability."""
