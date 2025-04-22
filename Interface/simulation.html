@@ -3,108 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulation d'Énergie</title>
+    <title>Simulation d'Énergie Renouvelable</title>
     <link rel="stylesheet" href="style/main.css">
+    <link rel="stylesheet" href="style/simulation-style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <header>
+        <div class="logo">
+            <i class="fas fa-solar-panel"></i>
+            <span>EcoEnergy</span>
+        </div>
         <h1>Simulation Intelligente d'Allocation d'Énergie</h1>
         <nav>
             <ul>
-                <li><a href="index.html">Tableau de bord</a></li>
-                <li><a href="forecast.html">Prévisions</a></li>
-                <li><a href="energy-graph.html">Graphiques d'énergie</a></li>
-                <li><a href="simulation.html" class="active">Simulation IA</a></li>
+                <li><a href="index.html"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
+                <li><a href="forecast.html"><i class="fas fa-chart-line"></i> Prévisions</a></li>
+                <li><a href="energy-graph.html"><i class="fas fa-chart-bar"></i> Graphiques</a></li>
+                <li><a href="simulation.html" class="active"><i class="fas fa-cogs"></i> Simulation IA</a></li>
             </ul>
         </nav>
     </header>
 
     <main>
-        <section id="simulation-controls">
-            <h2>Contrôles de Simulation</h2>
-            <div class="form-group">
-                <label for="simulation-time">Durée de simulation (heures):</label>
-                <input type="number" id="simulation-time" min="1" max="72" value="24">
+        <section id="simulation-controls" class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-sliders-h"></i> Contrôles de Simulation</h2>
+                <div class="card-tools">
+                    <button id="help-button" class="icon-button" title="Aide"><i class="fas fa-question-circle"></i></button>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="energy-demand">Demande d'énergie (kW):</label>
-                <input type="number" id="energy-demand" min="10" max="500" value="100">
+            <div class="card-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="simulation-time">
+                            <i class="fas fa-clock"></i> Durée de simulation:
+                        </label>
+                        <div class="input-wrapper">
+                            <input type="range" id="simulation-time-slider" min="1" max="72" value="24">
+                            <input type="number" id="simulation-time" min="1" max="72" value="24">
+                            <span class="unit">heures</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="energy-demand">
+                            <i class="fas fa-bolt"></i> Demande d'énergie:
+                        </label>
+                        <div class="input-wrapper">
+                            <input type="range" id="energy-demand-slider" min="10" max="500" value="100">
+                            <input type="number" id="energy-demand" min="10" max="500" value="100">
+                            <span class="unit">kW</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="grid-price">
+                            <i class="fas fa-euro-sign"></i> Prix du réseau:
+                        </label>
+                        <div class="input-wrapper">
+                            <input type="range" id="grid-price-slider" min="0.05" max="0.5" step="0.01" value="0.15">
+                            <input type="number" id="grid-price" min="0.05" max="0.5" step="0.01" value="0.15">
+                            <span class="unit">€/kWh</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button id="start-simulation" class="primary-button">
+                        <i class="fas fa-play"></i> Démarrer la Simulation
+                    </button>
+                    <button id="reset-simulation" class="secondary-button">
+                        <i class="fas fa-redo"></i> Réinitialiser
+                    </button>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="grid-price">Prix de l'électricité du réseau (€/kWh):</label>
-                <input type="number" id="grid-price" min="0.05" max="0.5" step="0.01" value="0.15">
-            </div>
-            <button id="start-simulation">Démarrer la Simulation</button>
         </section>
+
+        <div id="help-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Aide à la Simulation</h2>
+                <p>Cette simulation utilise l'intelligence artificielle pour optimiser l'allocation d'énergie entre sources renouvelables (solaire, éolienne) et le réseau électrique.</p>
+                <h3>Les paramètres:</h3>
+                <ul>
+                    <li><strong>Durée de simulation</strong>: Nombre d'heures à simuler (1-72)</li>
+                    <li><strong>Demande d'énergie</strong>: Besoin énergétique constant en kilowatts (10-500)</li>
+                    <li><strong>Prix du réseau</strong>: Coût de l'électricité provenant du réseau (0.05-0.5 €/kWh)</li>
+                </ul>
+                <p>Les résultats montrent la répartition optimale entre les différentes sources d'énergie pour minimiser les coûts et les émissions de CO2.</p>
+            </div>
+        </div>
 
         <section id="simulation-results">
-            <h2>Résultats de la Simulation</h2>
             <div class="results-cards">
                 <div class="card">
-                    <h3>Répartition d'Énergie</h3>
-                    <div class="chart-container">
-                        <canvas id="energy-allocation-chart"></canvas>
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-area"></i> Répartition d'Énergie</h3>
+                        <div class="card-tools">
+                            <button class="icon-button download-chart" data-chart="energy" title="Télécharger"><i class="fas fa-download"></i></button>
+                            <button class="icon-button fullscreen-chart" data-chart="energy" title="Plein écran"><i class="fas fa-expand"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="energy-allocation-chart"></canvas>
+                        </div>
                     </div>
                 </div>
                 <div class="card">
-                    <h3>Coût et Émissions</h3>
-                    <div class="chart-container">
-                        <canvas id="cost-emissions-chart"></canvas>
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-line"></i> Coût et Émissions</h3>
+                        <div class="card-tools">
+                            <button class="icon-button download-chart" data-chart="emissions" title="Télécharger"><i class="fas fa-download"></i></button>
+                            <button class="icon-button fullscreen-chart" data-chart="emissions" title="Plein écran"><i class="fas fa-expand"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="cost-emissions-chart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="simulation-details">
-            <h2>Détails de la Simulation</h2>
-            <div class="simulation-stats">
-                <div class="stat-card">
-                    <h3>Panneaux Solaires</h3>
-                    <div class="stat-value" id="avg-pv-panels">--</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Éoliennes</h3>
-                    <div class="stat-value" id="avg-wind-turbines">--</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Électricité du Réseau</h3>
-                    <div class="stat-value" id="avg-grid-power">--</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Coût Total</h3>
-                    <div class="stat-value" id="total-cost">--</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Émissions CO2</h3>
-                    <div class="stat-value" id="total-co2">--</div>
+        <section id="simulation-summary" class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-clipboard-list"></i> Résumé de la Simulation</h2>
+                <div class="card-tools">
+                    <button id="export-summary" class="icon-button" title="Exporter en PDF"><i class="fas fa-file-pdf"></i></button>
                 </div>
             </div>
-            <div class="simulation-table-container">
-                <table id="simulation-data-table">
-                    <thead>
-                        <tr>
-                            <th>Heure</th>
-                            <th>Facteur Solaire</th>
-                            <th>Facteur Éolien</th>
-                            <th>Panneaux PV</th>
-                            <th>Éoliennes</th>
-                            <th>Puissance Réseau</th>
-                            <th>Énergie Totale</th>
-                            <th>Coût</th>
-                            <th>Émissions CO2</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Data will be filled by JavaScript -->
-                    </tbody>
-                </table>
+            <div class="card-body">
+                <div class="simulation-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-solar-panel"></i></div>
+                        <h3>Panneaux Solaires</h3>
+                        <div class="stat-value" id="avg-pv-panels">--</div>
+                        <div class="stat-label">unités</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-wind"></i></div>
+                        <h3>Éoliennes</h3>
+                        <div class="stat-value" id="avg-wind-turbines">--</div>
+                        <div class="stat-label">unités</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-plug"></i></div>
+                        <h3>Réseau Électrique</h3>
+                        <div class="stat-value" id="avg-grid-power">--</div>
+                        <div class="stat-label">kW</div>
+                    </div>
+                    <div class="stat-card highlight">
+                        <div class="stat-icon"><i class="fas fa-euro-sign"></i></div>
+                        <h3>Coût Total</h3>
+                        <div class="stat-value" id="total-cost">--</div>
+                        <div class="stat-label">euros</div>
+                    </div>
+                    <div class="stat-card highlight">
+                        <div class="stat-icon"><i class="fas fa-smog"></i></div>
+                        <h3>Émissions CO2</h3>
+                        <div class="stat-value" id="total-co2">--</div>
+                        <div class="stat-label">kg</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="simulation-details" class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-table"></i> Détails de la Simulation</h2>
+                <div class="card-tools">
+                    <button id="export-csv" class="icon-button" title="Exporter en CSV"><i class="fas fa-file-csv"></i></button>
+                    <div class="search-container">
+                        <input type="text" id="table-search" placeholder="Rechercher...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="simulation-table-container">
+                    <table id="simulation-data-table">
+                        <thead>
+                            <tr>
+                                <th>Heure <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                                <th>Facteur Solaire <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                                <th>Facteur Éolien <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                                <th>Panneaux PV <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                                <th>Éoliennes <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                                <th>Puissance Réseau <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                                <th>Énergie Totale <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                                <th>Coût <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                                <th>Émissions CO2 <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be filled by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination">
+                    <button id="prev-page" disabled><i class="fas fa-chevron-left"></i></button>
+                    <span id="page-info">Page 1 sur 1</span>
+                    <button id="next-page" disabled><i class="fas fa-chevron-right"></i></button>
+                </div>
             </div>
         </section>
     </main>
 
     <footer>
-        <p>Système de Gestion Intelligente d'Énergie Renouvelable</p>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Système de Gestion Intelligente d'Énergie Renouvelable</h3>
+                <p>Optimisation des ressources énergétiques par intelligence artificielle</p>
+            </div>
+            <div class="footer-section">
+                <p>© 2025 EcoEnergy - Tous droits réservés</p>
+            </div>
+        </div>
     </footer>
 
     <script src="scripts/api.js"></script>
