@@ -11,17 +11,13 @@
 </head>
 <body>
     <header>
-        <div class="logo">
-            <i class="fas fa-solar-panel"></i>
-            <span>EcoEnergy</span>
-        </div>
         <h1>Simulation Intelligente d'Allocation d'Énergie</h1>
         <nav>
             <ul>
-                <li><a href="index.html"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
-                <li><a href="forecast.html"><i class="fas fa-chart-line"></i> Prévisions</a></li>
-                <li><a href="energy-graph.html"><i class="fas fa-chart-bar"></i> Graphiques</a></li>
-                <li><a href="simulation.html" class="active"><i class="fas fa-cogs"></i> Simulation IA</a></li>
+                <li><a href="index.html"> Tableau de bord</a></li>
+                <li><a href="forecast.html"> Prévisions</a></li>
+                <li><a href="energy-graph.html"> Graphiques</a></li>
+                <li><a href="simulation.html" class="active"> Simulation IA</a></li>
             </ul>
         </nav>
     </header>
@@ -133,6 +129,9 @@
                     <button id="export-summary" class="icon-button" title="Exporter en PDF"><i class="fas fa-file-pdf"></i></button>
                 </div>
             </div>
+            <div class="chart-container">
+                <canvas id="total-energy-chart"></canvas>
+            </div>
             <div class="card-body">
                 <div class="simulation-stats">
                     <div class="stat-card">
@@ -206,6 +205,10 @@
                     <span id="page-info">Page 1 sur 1</span>
                     <button id="next-page" disabled><i class="fas fa-chevron-right"></i></button>
                 </div>
+                <div class="stat-item">
+                    <span class="stat-label">Énergie Totale Moyenne:</span>
+                    <span id="avg-total-energy">0 kW</span>
+                </div>
             </div>
         </section>
     </main>
@@ -217,7 +220,7 @@
                 <p>Optimisation des ressources énergétiques par intelligence artificielle</p>
             </div>
             <div class="footer-section">
-                <p>© 2025 EcoEnergy - Tous droits réservés</p>
+                <p>© 2025 LBD17 - Tous droits réservés</p>
             </div>
         </div>
     </footer>

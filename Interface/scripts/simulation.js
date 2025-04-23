@@ -1,6 +1,7 @@
 // Charts for displaying simulation results
 let energyAllocationChart = null;
 let costEmissionsChart = null;
+let totalEnergyChart = null;  // New chart for total energy
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', function() {
@@ -141,6 +142,53 @@ function initializeCharts() {
             }
         }
     });
+    
+    // Total energy chart (new)
+    const totalEnergyCtx = document.getElementById('total-energy-chart').getContext('2d');
+    totalEnergyChart = new Chart(totalEnergyCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [
+                {
+                    label: 'Énergie Totale',
+                    data: [],
+                    borderColor: '#2ECC71', // Green color for total energy
+                    backgroundColor: 'rgba(46, 204, 113, 0.2)',
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Heure'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Énergie Totale (kW)'
+                    },
+                    beginAtZero: false // Allow focusing on the small variations
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Énergie Totale par Heure'
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
+            }
+        }
+    });
 }
 
 // Run the simulation
@@ -200,6 +248,9 @@ function updateChartsWithData(results) {
     const windEnergy = results.map(r => r.windTurbines * r.windFactor);
     const gridEnergy = results.map(r => r.gridPower);
     
+    // Total energy values directly from results
+    const totalEnergy = results.map(r => r.totalEnergy);
+    
     // Cost and emissions
     const costs = results.map(r => r.cost);
     const emissions = results.map(r => r.co2);
@@ -216,6 +267,21 @@ function updateChartsWithData(results) {
     costEmissionsChart.data.datasets[0].data = costs;
     costEmissionsChart.data.datasets[1].data = emissions;
     costEmissionsChart.update();
+    
+    // Update total energy chart
+    totalEnergyChart.data.labels = hours;
+    totalEnergyChart.data.datasets[0].data = totalEnergy;
+    
+    // Calculate min and max values for better y-axis scaling on total energy chart
+    const min = Math.min(...totalEnergy);
+    const max = Math.max(...totalEnergy);
+    const padding = (max - min) * 0.1; // 10% padding
+    
+    // Set y-axis limits to focus on the variations
+    totalEnergyChart.options.scales.y.min = Math.max(0, min - padding);
+    totalEnergyChart.options.scales.y.max = max + padding;
+    
+    totalEnergyChart.update();
 }
 
 // Update summary statistics
@@ -223,6 +289,7 @@ function updateSummaryStats(summary) {
     document.getElementById('avg-pv-panels').textContent = summary.averagePvPanels;
     document.getElementById('avg-wind-turbines').textContent = summary.averageWindTurbines;
     document.getElementById('avg-grid-power').textContent = summary.averageGridPower + ' kW';
+    document.getElementById('avg-total-energy').textContent = summary.averageTotalEnergy + ' kW'; // Add display for average total energy
     document.getElementById('total-cost').textContent = summary.totalCost + ' €';
     document.getElementById('total-co2').textContent = summary.totalCO2 + ' kg';
 }
